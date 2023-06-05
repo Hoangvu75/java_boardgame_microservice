@@ -1,0 +1,118 @@
+# Define YAML anchors for common properties
+x-common:
+    &common
+    env_file: service-env.env
+    restart: always
+    networks:
+        - spring-cloud-network
+
+services:
+    # gateway 
+    gateway:
+        container_name: gateway
+        build:
+            context: .
+            dockerfile: gateway/Dockerfile
+        image: gateway:latest
+        restart: always
+        ports:
+            - 8080:8080
+        networks:
+            - spring-cloud-network
+
+    # kafka environment
+    zookeeper:
+        image: confluentinc/cp-zookeeper:7.3.2
+        container_name: zookeeper
+        restart: always
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+        networks:
+            - spring-cloud-network
+
+    broker:
+        image: confluentinc/cp-kafka:7.3.2
+        container_name: broker
+        ports:
+            - 9092:9092
+        restart: always
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, PLAINTEXT_INTERNAL:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092, PLAINTEXT_INTERNAL://broker:29092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+        networks:
+            - spring-cloud-network
+
+    # database configuration
+    db:
+        container_name: db
+        image: postgres
+        restart: always
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=Huyhoangdeptrai2003@
+            - POSTGRES_DB=test
+        ports:
+            - 5432:5432
+        networks:
+            - spring-cloud-network
+
+    # services
+    authservice:
+        container_name: ${AUTH_SERVICE_NAME}
+        image: ${AUTH_SERVICE_NAME}:latest
+        build:
+            context: .
+            dockerfile: ${AUTH_SERVICE_NAME}/Dockerfile
+        ports:
+            - ${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}
+        environment:
+            - server.port=${AUTH_SERVICE_PORT}
+        <<: *common
+
+    userservice:
+        container_name: ${USER_SERVICE_NAME}
+        image: ${USER_SERVICE_NAME}:latest
+        build:
+            context: .
+            dockerfile: ${USER_SERVICE_NAME}/Dockerfile
+        ports:
+            - ${USER_SERVICE_PORT}:${USER_SERVICE_PORT}
+        environment:
+            - server.port=${USER_SERVICE_PORT}
+        <<: *common
+
+    contractservice:
+        container_name: ${CONTRACT_SERVICE_NAME}
+        image: ${CONTRACT_SERVICE_NAME}:latest
+        build:
+            context: .
+            dockerfile: ${CONTRACT_SERVICE_NAME}/Dockerfile
+        ports:
+            - ${CONTRACT_SERVICE_PORT}:${CONTRACT_SERVICE_PORT}
+        environment:
+            - server.port=${CONTRACT_SERVICE_PORT}
+        <<: *common
+
+    boardgameservice:
+        container_name: ${BOARDGAME_SERVICE_NAME}
+        image: ${BOARDGAME_SERVICE_NAME}:latest
+        build:
+            context: .
+            dockerfile: ${BOARDGAME_SERVICE_NAME}/Dockerfile
+        ports:
+            - ${BOARDGAME_SERVICE_PORT}:${BOARDGAME_SERVICE_PORT}
+        environment:
+            - server.port=${BOARDGAME_SERVICE_PORT}
+        <<: *common
+
+networks:
+    spring-cloud-network:
+        driver: bridge
+
+# docker-compose up --force-recreate --build -d
