@@ -1,9 +1,0 @@
-﻿.vscode
-authservice/.vscode
-authservice/target
-boardgameservice/target
-contractservice/target
-gateway/.vscode
-gateway/target
-userservice/.vscode
-userservice/target
