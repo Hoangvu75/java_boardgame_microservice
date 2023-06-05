@@ -51,6 +51,11 @@ public class AuthController {
         return ResponseEntity.ok(authenticationService.getManagerData(authorization));
     }
 
+    @GetMapping("/get-all")
+    public ResponseEntity<Object> getAll() {
+        return ResponseEntity.ok(authenticationService.getAll());
+    }
+
     private void checkForValidation(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errorDetails = bindingResult.getAllErrors().stream()

@@ -3,6 +3,7 @@ package com.boardgame.authservice.auth.services;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -80,6 +81,17 @@ public class AuthService {
         LinkedHashMap<String, Object> response = new LinkedHashMap<>();
         response.put("manager", manager);
         response.put("message", "Get data successfully.");
+        response.put("timestamp", Timestamp.valueOf(LocalDateTime.now()));
+
+        return response;
+    }
+
+    public Object getAll() {
+        List<Manager> managers = managerRepository.findAll();
+
+        LinkedHashMap<String, Object> response = new LinkedHashMap<>();
+        response.put("managers", managers);
+        response.put("message", "Get all managers successfully.");
         response.put("timestamp", Timestamp.valueOf(LocalDateTime.now()));
 
         return response;
