@@ -9,16 +9,18 @@ x-common:
 services:
     # gateway 
     gateway:
-        container_name: gateway
+        container_name: ${GATEWAY_NAME}
         build:
             context: .
-            dockerfile: gateway/Dockerfile
-        image: gateway:latest
+            dockerfile: ${GATEWAY_NAME}/Dockerfile
+        image: ${GATEWAY_NAME}:latest
         restart: always
         ports:
-            - 8080:8080
+            - ${GATEWAY_PORT}:${GATEWAY_PORT}
         environment:
-            - server.port=8080
+            - server.port=${GATEWAY_PORT}
+            - eureka.client.service-url.defaultZone=http://netflixeureka:8761/eureka
+            - spring.application.name=${GATEWAY_NAME}
         networks:
             - spring-cloud-network
 
@@ -75,6 +77,7 @@ services:
             - ${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}
         environment:
             - server.port=${AUTH_SERVICE_PORT}
+            - spring.application.name=${AUTH_SERVICE_NAME}
         <<: *common
 
     userservice:
@@ -86,7 +89,8 @@ services:
         ports:
             - ${USER_SERVICE_PORT}:${USER_SERVICE_PORT}
         environment:
-            - server.port=${USER_SERVICE_PORT}
+            - server.port=${USER_SERVICE_PORT} 
+            - spring.application.name=${USER_SERVICE_NAME}
         <<: *common
 
     contractservice:
@@ -99,6 +103,7 @@ services:
             - ${CONTRACT_SERVICE_PORT}:${CONTRACT_SERVICE_PORT}
         environment:
             - server.port=${CONTRACT_SERVICE_PORT}
+            - spring.application.name=${CONTRACT_SERVICE_NAME}
         <<: *common
 
     boardgameservice:
@@ -111,6 +116,7 @@ services:
             - ${BOARDGAME_SERVICE_PORT}:${BOARDGAME_SERVICE_PORT}
         environment:
             - server.port=${BOARDGAME_SERVICE_PORT}
+            - spring.application.name=${BOARDGAME_SERVICE_NAME}
         <<: *common
 
 networks:
